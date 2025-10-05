@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор тараканов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Калькулятор тараканов</h1>
+
+    <div class="input-group">
+        <label for="live">Живые тараканы (шт):</label>
+        <input type="number" id="live" oninput="updateValues()">
+    </div>
+
+    <div class="input-group">
+        <label for="live_weight">Вес живых тараканов (грамм):</label>
+        <input type="number" id="live_weight" oninput="updateValues()">
+    </div>
+
+    <div class="input-group">
+        <label for="frozen">Замороженные тараканы (грамм):</label>
+        <input type="number" id="frozen" oninput="updateValues()">
+    </div>
+
+    <div class="input-group">
+        <label for="dried">Сушёные тараканы (грамм):</label>
+        <input type="number" id="dried" oninput="updateValues()">
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <button onclick="window.open('https://www.avito.ru/user/5b9e8abd17f733a213ce1bfeb6267599/profile?src=sharing', '_blank')">
+        Заказать
+    </button>
+
+    <script>
+        // Коэффициенты пересчёта:
+        // 1 гр живых тараканов = 3 штуки
+        // 100 живых тараканов = 70 гр замороженных
+        // 100 живых тараканов = 30 гр сушёных
+        const LIVE_PER_GRAM = 3; // Штук в 1 грамме живых тараканов
+        const LIVE_TO_FROZEN = 70 / 100; // 70 гр замороженных = 100 живых
+        const LIVE_TO_DRIED = 30 / 100;   // 30 гр сушёных = 100 живых
+
+        function updateValues() {
+            const liveInput = document.getElementById('live');
+            const liveWeightInput = document.getElementById('live_weight');
+            const frozenInput = document.getElementById('frozen');
+            const driedInput = document.getElementById('dried');
+
+            const resultDiv = document.getElementById('result');
+
+            // Определяем, какое поле изменилось последним
+            const changedField = document.activeElement.id;
+
+            if (changedField === 'live') {
+                const liveCount = parseFloat(liveInput.value) || 0;
+                const liveWeight = liveCount / LIVE_PER_GRAM;
+                liveWeightInput.value = liveWeight.toFixed(2);
+                frozenInput.value = (liveCount * LIVE_TO_FROZEN).toFixed(2);
+                driedInput.value = (liveCount * LIVE_TO_DRIED).toFixed(2);
+                resultDiv.textContent = `Рассчитано на основе ${liveCount} живых тараканов (вес: ${liveWeight.toFixed(2)} гр).`;
+            }
+            else if (changedField === 'live_weight') {
+                const liveWeight = parseFloat(liveWeightInput.value) || 0;
+                const liveCount = liveWeight * LIVE_PER_GRAM;
+                liveInput.value = Math.round(liveCount);
+                frozenInput.value = (liveCount * LIVE_TO_FROZEN).toFixed(2);
+                driedInput.value = (liveCount * LIVE_TO_DRIED).toFixed(2);
+                resultDiv.textContent = `Рассчитано на основе ${liveWeight} гр живых тараканов.`;
+            }
+            else if (changedField === 'frozen') {
+                const frozen = parseFloat(frozenInput.value) || 0;
+                const liveCount = frozen / LIVE_TO_FROZEN;
+                liveInput.value = Math.round(liveCount);
+                liveWeightInput.value = (liveCount / LIVE_PER_GRAM).toFixed(2);
+                driedInput.value = (liveCount * LIVE_TO_DRIED).toFixed(2);
+                resultDiv.textContent = `Рассчитано на основе ${frozen} гр замороженных тараканов.`;
+            }
+            else if (changedField === 'dried') {
+                const dried = parseFloat(driedInput.value) || 0;
+                const liveCount = dried / LIVE_TO_DRIED;
+                liveInput.value = Math.round(liveCount);
+                liveWeightInput.value = (liveCount / LIVE_PER_GRAM).toFixed(2);
+                frozenInput.value = (liveCount * LIVE_TO_FROZEN).toFixed(2);
+                resultDiv.textContent = `Рассчитано на основе ${dried} гр сушёных тараканов.`;
+            }
+        }
+    </script>
+</body>
+</html>
